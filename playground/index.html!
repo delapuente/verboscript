@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Verboscript playground</title>
+    <meta charset="UTF-8"/>
+    <script defer src="lib/verboscript.js"></script>
+    <script defer src="../dist/verboscript.js"></script>
+    <script defer src="playground.js"></script>
+  </head>
+  <body>
+    <article>
+      <pre contenteditable="true">console = #console.
+find `the needle `in `the haystack ->
+  get the n-th position by applying haystack.indexOf on needle;
+
+needle = 1
+haystack = {1 2 3}
+result = find the needle in the haystack
+console.log result
+
+if test `passes `do this `and `else `do that ->
+  that ?= []
+  passes = check test
+  passes ? do this : do that;
+;
+
+value `of n ->
+  if [n.] do [
+    print with console.log the text 'true'
+  ], else do [
+    print with console.log the text 'false'
+  ]
+;
+
+value of 5</pre>
+      <pre>
+      </pre>
+    </article>
+  </body>
+</html>
+
