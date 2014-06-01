@@ -3,6 +3,8 @@
   var indentation = '  ';
   var indentationLevel = '';
 
+  var SKIP = {};
+
   function enterContext(names) {
     (typeof names === 'undefined') && (names = []);
 
@@ -58,21 +60,19 @@
       console.error(e.stack);
       throw e;
     }
-    var output = '';
-    output += generators[node.rule](node);
-    return output;
+    return generators[node.rule](node);
   }
 
   var generators = {
 
     Program: function (node) {
-      var intro = '(function (global) {';
+      var intro = '(function () {';
 
       enterContext();
       var source = translateToJS(node.source);
       var declarations = getDeclarations();
       var body = indent(
-        '\'use strict \'\n\n' +
+        '\'use strict\'\n\n' +
         (declarations ? declarations + '\n\n' : '') +
         source
       );
@@ -86,10 +86,17 @@
     Sentences: function (node) {
       if (node.sentences.length === 0) { return 'return;' }
 
-      var lastIndex = node.sentences.length - 1;
-      return node.sentences.map(function (child, index) { 
-        var jsExpression = translateToJS(child);
-        return (index === lastIndex ? 'return ' : '') + jsExpression + ';'; 
+      var realSentences =
+        node.sentences.map(function (sentence) {
+          return translateToJS(sentence);
+        }).filter(function (jsSentence) {
+          return jsSentence !== SKIP;
+        });
+
+console.log(realSentences);
+      var lastIndex = realSentences.length - 1;
+      return realSentences.map(function (jsSentence, index) {
+        return (index === lastIndex ? 'return ' : '') + jsSentence + ';';
       }).join('\n');
     },
 
@@ -100,7 +107,7 @@
       var parameters = translateToJS(node.signature.parameters);
       var intro =
         functionName + ' = function ' + functionName + '(' + parameters + ') {';
-      
+
       enterContext(
         node.signature.parameters.ids.map(function (id) {
           return id.label; }
@@ -157,6 +164,8 @@
         offset++;
       }
 
+      if (!functionReference) { return SKIP; }
+
       /* The remainding candidates are parameters instead */
       var parameters = node.parameters ? node.parameters : [];
       parameters = possibleMemories.slice(offset).concat(parameters);
@@ -173,9 +182,9 @@
       var test = translateToJS(node.test);
       var ifActions = translateToJS(node.if);
       var elseActions = translateToJS(node.else);
-      
+
       var immediateFunctionIntro = '(function () {';
-      
+
       enterContext();
       var ifIntro = 'if (' + test + ') {';
       var ifBody = indent(ifActions);
@@ -192,7 +201,7 @@
 
       var immediateFunctionOutro = '}.call(this))';
       exitContext();
-      
+
       return [
         immediateFunctionIntro,
         completeIf,
@@ -258,10 +267,14 @@
       return 'this';
     },
 
+    Nil: function (node) {
+      return 'null';
+    },
+
     Number: function (node) {
       return node.value;
     },
- 
+
     String: function (node) {
       return JSON.stringify(node.value);
     },
@@ -309,23 +322,21 @@
   }
 }
 
-
 Program
- = __ root:Sentences __ { 
+ = EOL* root:Sentences EOL* {
     var program = { rule: 'Program', source: root };
-    var output = { output: '\n' + translateToJS(program), ast:root };
+    var output = { output: translateToJS(program), ast:root };
     return output;
    }
 
 Sentences
- = first:Sentence more:(EOL __ Sentence)* {
-  return { rule: 'Sentences', sentences: buildList(first, more, 2) };
- }
+ = first:Sentence more:(EOL Sentence)* {
+    return { rule: 'Sentences', sentences: buildList(first, more, 1) };
+   }
  / "" { return { rule: 'Sentences', sentences: [] }; }
 
 Sentence
- = Statement
- / SimpleExpression
+ = WhiteSpace* sentence:(Statement / SimpleExpression) { return sentence; }
 
 Statement
  = AssignmentStatement
@@ -350,22 +361,22 @@ AssignmentStatement
    }
 
 IfStatement
- = test:SimpleExpression _? "?" __ ifBody:Sentences __ ":" __ elseBody:Sentences __ ";" {
-    return { 
+ = test:SimpleExpression _? "?" _ ifCall:CallStatement _ ":" _ elseCall:CallStatement {
+    return {
      rule:'IfStatement',
      test: test,
-     if: ifBody,
-     else: elseBody
+     if: ifCall,
+     else: elseCall
     }
    }
 
 LoopStatement
- = test:SimpleExpression _? "@" __ body:Sentences __ ";" {
-     return { rule: 'LoopStatement', test: test, body: body };
+ = test:SimpleExpression _? "@" __ body:CallStatement {
+    return { rule: 'LoopStatement', test: test, body: body };
    }
 
 DefinitionStatement
- = signature:Signature _ "->" __ body:Sentences __ ";" {
+ = signature:Signature _ "->" __ body:Sentences __ EOD {
     return { rule: 'DefinitionStatement', signature: signature, body: body };
    }
 
@@ -386,10 +397,10 @@ AssignmentToken
  * remainders.
  */
 CallStatement
- = callees:MemorySequence noCall:NoCallToken? params:(_ SimpleExpression)* {
-    // This makes the trick for when the developer does not want to call but 
+ = _? callees:MemorySequence noCall:NoCallToken? params:(_ SimpleExpression)* _? {
+    // This makes the trick for when the developer does not want to call but
     // to refer.
-    if (noCall) { return callees.memories[callees.memories.length - 1]; } 
+    if (noCall) { return callees.memories[callees.memories.length - 1]; }
     return {
      rule: 'CallStatement',
      candidates: callees,
@@ -405,6 +416,7 @@ Literal
  / List
  / Dictionary
  / String
+ / Nil
 
 Number
  = NumericLiteral
@@ -423,7 +435,7 @@ String
  = StringLiteral
 
 Block
- = "[" __ body:Sentences __ "]" { 
+ = "[" __ body:Sentences __ "]" {
     return {
      rule: 'Block',
      body: body
@@ -487,6 +499,9 @@ Id "identifier"
 Self
  = "#" { return { rule: "Self" }; }
 
+Nil
+ = "<>" { return { rule: "Nil" }; }
+
 IdSequence
  = first:Id more:(_ Id)* {
     return { rule: "IdSequence", ids: buildList(first, more, 1) };
@@ -494,29 +509,30 @@ IdSequence
 
 /* Terminators */
 
-EOS
- = _? ";"
+EOD
+ = ";"
 
 EOF
  = !.
 
 EOL
- = LineTerminatorSequence
+ = LineTerminatorSequence+
 
 _
  = (WhiteSpace / Ignorable)+
 
 Ignorable
  = "`" Id
+ / "," / ":"
 
 /* Skipped */
 
 __
- = (_ / EOL)*
+ = (WhiteSpace / EOL)*
 
 
 /*
- * Borrowed from the PEG JavaScript grammar by David Majda: 
+ * Borrowed from the PEG JavaScript grammar by David Majda:
  * https://github.com/dmajda/pegjs/blob/master/examples/javascript.pegjs
  */
 
@@ -878,5 +894,4 @@ VarToken        = "var"        !IdentifierPart
 VoidToken       = "void"       !IdentifierPart
 WhileToken      = "while"      !IdentifierPart
 WithToken       = "with"       !IdentifierPart
-
 

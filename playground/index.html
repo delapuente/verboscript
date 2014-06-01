@@ -5,35 +5,145 @@
     <meta charset="UTF-8"/>
     <script defer src="../dist/verboscript.js"></script>
     <script defer src="playground.js"></script>
+    <style>
+      html {
+        font-size: 63.5%;
+        font-family: Arial, sans;
+        background-color: #eee8d5;
+      }
+      h1, h2 {
+        text-align: left;
+      }
+      body { font-size: 2rem; text-align: justify; color: #586e75; }
+      pre {
+        padding: 1.5rem 1rem;
+        border-radius: 0.5rem;
+        overflow: auto;
+      }
+      pre.source {
+        color: #93a1a1;
+        background-color: #073642;
+      }
+      pre.result {
+        background-color: transparent;
+        border: 0.1rem solid #6c71c4;
+        color: #333;
+        font-weight: bold;
+      }
+      pre.result::before {
+        content: "result";
+        padding-right: 1ex;
+        margin-right: 1ex;
+        border-right: 0.1rem solid #6c71c4;
+        color: #888;
+        font-weight: normal;
+      }
+      pre.output {
+        border: 0.2rem dashed #6c71c4;
+      }
+      h2 {
+        color: #cb4b16;
+      }
+    </style>
   </head>
   <body>
+    <h1>Welcome to Verboscript playground!</h1>
+    <p>
+      Here you will learn a couple of things about this language, feel free to 
+      toy as much as you want with the code samples and you'll see the result 
+      and the translated JavaScript below. Ready?
+    </p>
     <article>
-      <pre contenteditable="true">console = #console.
-find `the needle `in `the haystack ->
-  get the n-th position by applying haystack.indexOf on needle;
-
-needle = 1
-haystack = {1 2 3}
-result = find the needle in the haystack
-console.log result
-
-if test `passes `do this `and `else `do that ->
-  that ?= []
-  passes = check test
-  passes ? do this : do that;
-;
-
-value `of n ->
-  if [n.] do [
-    print with console.log the text 'true'
-  ], else do [
-    print with console.log the text 'false'
-  ]
-;
-
-value of 5</pre>
+      <h2>Lines and blanks</h2>
+      <p>
+        A program in Verboscript is no more than a bunch of sentences or
+        <em>statements</em> separated by new lines. Only one statement per
+        line is allowed. Verboscript is quite strict and will require you
+        to pay some attention to unnecesary blanks. For instance, it does not
+        allow trailing spaces and it requires to be blankspaces in both sides
+        of the operators.
+      </p>
       <pre>
-      </pre>
+
+a = 1
+
+ b = 2
+
+</pre>
+    </article>
+    <article>
+      <h2>Statements</h2>
+      <p>
+        Those sentences altering the state of the program are called
+        <em>statements</em> in opposition to those with no side effects
+        refered as transparent expressions or simply expressions.
+      </p>
+      <h3>Assignment statements</h3>
+      <p>
+        The sentence to introduce a new object in the program is the
+        assignation. There is no variable declaration in Verboscript, you only
+        need to assign some value to a name. Use the nil symbol
+        (<code>&lt;&gt;</code>) to introduce a name without content.
+      </p>
+      <pre>a = &lt;&gt;
+b = "hello world!"
+c = 5</pre>
+      <h3>Definitions</h3>
+      <p>
+        A definition introduces a new <em>function</em>. When defining a
+        function you can use words and supporting words to explain the purpose
+        of the function. The first not skipped word (those starting by
+        <code>`</code>) becomes the name of the function and the remaining ones
+        become the parameters.
+      </p>
+      <pre>find `the needle `in `the haystack ->
+  get the n-th position by applying haystack.indexOf on the needle;</pre>
+      <h3>Calls</h3>
+      <p>
+        A call causes the body of a function to be executed. Verboscript
+        identify a call by recognizing any sequence of identifiers, memory or
+        expressions. The first defined symbol is considered the name of the
+        function and the remaining defined ids or expressions, the parameters.
+      </p>
+      <pre>find `the needle `in `the haystack ->
+  get the n-th position by applying haystack.indexOf on the needle;
+
+haystack = {1 2 3 4 5}
+needle = 3
+find the needle in the haystack
+</pre>
+      <p>
+        If there is no function name identified, the sentence is simply ignored.
+        You can force to ignore some ids by prefixing them with <code>`</code>.
+      </p>
+      <pre>find `the needle `in `the haystack ->
+  get the n-th position by applying haystack.indexOf on the needle;
+
+haystack = {1 2 3 4 5}
+needle = 3
+`find the `needle in the `haystack
+this is not recognized at all and it is simply ignored</pre>
+      <!--<pre>Start by importing some useful functions:-->
+
+<!--log = #console.log.-->
+<!--stringify = #JSON.stringify.-->
+
+<!--Now define the program functions: -->
+
+<!--if test `do this, `else `do that ->-->
+  <!--test ? do this : do that;-->
+
+<!--factorial `of n ->-->
+  <!--if n &lt; 1 then [n], else [-->
+    <!--previous-factorial = factorial of n - 1-->
+    <!--n * previous-factorial-->
+  <!--];-->
+
+<!--Now do some computations:-->
+
+<!--result = factorial of 10-->
+<!--log the result and-->
+<!--stringify the result too</pre>-->
     </article>
   </body>
 </html>

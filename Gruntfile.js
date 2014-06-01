@@ -8,7 +8,9 @@ module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
   var srcFiles = [
-    '<%= dirs.src %>/**/*.js'
+    '<%= dirs.demo %>/**/*.js',
+    '<%= dirs.demo %>/**/*.html',
+    '<%= dirs.src %>/**/*.pegjs'
   ];
 
   var demoSrcFiles = [
@@ -42,7 +44,7 @@ module.exports = function(grunt) {
       src: 'grammar',
       bin: 'dist',
       build: 'build',
-      demo: 'demo',
+      demo: 'playground',
       test: 'test',
       spec: '<%= dirs.test %>/spec',
       tmp: '.tmp'
@@ -191,8 +193,8 @@ module.exports = function(grunt) {
         }
       },
       playground: {
-        files: '<%= files.grammar %>',
-        tasks: [],
+        files: srcFiles,
+        tasks: ['pack'],
         options: {
           livereload: 35730
         }
@@ -213,6 +215,10 @@ module.exports = function(grunt) {
   ]);
   grunt.registerTask('min', ['uglify:pack']);
   grunt.registerTask('dev', ['watch']);
-  grunt.registerTask('playground', ['connect:playground', 'watch:playground']);
+  grunt.registerTask('playground', [
+    'pack',
+    'connect:playground',
+    'watch:playground'
+  ]);
   grunt.registerTask('debug', ['connect:debug', 'watch:debug']);
 };
