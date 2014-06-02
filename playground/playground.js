@@ -3,37 +3,38 @@
   var verboscript = this.verboscript;
 
   var sources = Array.prototype.slice.call(
-    document.querySelectorAll('pre')
+    document.querySelectorAll('textarea')
   );
 
   sources.forEach(function (source) {
     source.classList.add('source');
-    source.setAttribute('contenteditable', 'true');
     var output = document.createElement('pre');
-    var target = document.createElement('pre');
+    var result = document.createElement('pre');
 
     output.classList.add('output');
-    target.classList.add('result');
+    result.classList.add('result');
     source.parentNode.insertBefore(output, source.nextSibling);
-    source.parentNode.insertBefore(target, source.nextSibling);
+    source.parentNode.insertBefore(result, source.nextSibling);
 
     source.addEventListener('input',
-      updateContent.bind(undefined, source, target, output));
+      updateContent.bind(undefined, source, result, output));
 
-    updateContent(source, target, output);
+    updateContent(source, result, output);
 
-    function updateContent(source, target, output) {
+    function updateContent(source, result, output) {
       clearTimeout(source.timeoutToSave);
+      source.style.height = 0 + 'px';
+      source.style.height = source.scrollHeight + 'px';
       source.timeoutToSave = setTimeout(function _translate() {
         try {
-          var result = verboscript.parse(source.textContent);
-          output.textContent = result.output.trim();
+          var parsed = verboscript.parse(source.textContent);
+          output.textContent = parsed.output.trim();
           with (document) {
-            target.textContent = eval(result.output);
+            result.textContent = eval(parsed.output);
           }
         } catch (e) {
           if (e instanceof verboscript.SyntaxError) {
-            target.textContent = 'Error in line ' + e.line + ':' + e.column +
+            result.textContent = 'Error in line ' + e.line + ':' + e.column +
                                  ' ' + e.message;
           }
         }

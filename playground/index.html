@@ -15,12 +15,17 @@
         text-align: left;
       }
       body { font-size: 2rem; text-align: justify; color: #586e75; }
-      pre {
+      pre, textarea {
         padding: 1.5rem 1rem;
         border-radius: 0.5rem;
         overflow: auto;
       }
-      pre.source {
+      textarea {
+        box-sizing: border-box;
+        width: 100%;
+        overflow: hidden;
+      }
+      textarea.source {
         color: #93a1a1;
         background-color: #073642;
       }
@@ -63,13 +68,13 @@
         allow trailing spaces and it requires to be blankspaces in both sides
         of the operators.
       </p>
-      <pre>
+      <textarea>
 
 a = 1
 
  b = 2
 
-</pre>
+</textarea>
     </article>
     <article>
       <h2>Statements</h2>
@@ -85,9 +90,9 @@ a = 1
         need to assign some value to a name. Use the nil symbol
         (<code>&lt;&gt;</code>) to introduce a name without content.
       </p>
-      <pre>a = &lt;&gt;
+      <textarea>a = &lt;&gt;
 b = "hello world!"
-c = 5</pre>
+c = 5</textarea>
       <h3>Definitions</h3>
       <p>
         A definition introduces a new <em>function</em>. When defining a
@@ -96,8 +101,8 @@ c = 5</pre>
         <code>`</code>) becomes the name of the function and the remaining ones
         become the parameters.
       </p>
-      <pre>find `the needle `in `the haystack ->
-  get the n-th position by applying haystack.indexOf on the needle;</pre>
+      <textarea>find `the needle `in `the haystack ->
+  get the n-th position by applying haystack.indexOf on the needle;</textarea>
       <h3>Calls</h3>
       <p>
         A call causes the body of a function to be executed. Verboscript
@@ -105,25 +110,25 @@ c = 5</pre>
         expressions. The first defined symbol is considered the name of the
         function and the remaining defined ids or expressions, the parameters.
       </p>
-      <pre>find `the needle `in `the haystack ->
+      <textarea>find `the needle `in `the haystack ->
   get the n-th position by applying haystack.indexOf on the needle;
 
 haystack = {1 2 3 4 5}
 needle = 3
 find the needle in the haystack
-</pre>
+</textarea>
       <p>
         If there is no function name identified, the sentence is simply ignored.
         You can force to ignore some ids by prefixing them with <code>`</code>.
       </p>
-      <pre>find `the needle `in `the haystack ->
+      <textarea>find `the needle `in `the haystack ->
   get the n-th position by applying haystack.indexOf on the needle;
 
 haystack = {1 2 3 4 5}
 needle = 3
 `find the `needle in the `haystack
-this is not recognized at all and it is simply ignored</pre>
-      <!--<pre>Start by importing some useful functions:-->
+this is not recognized at all and it is simply ignored</textarea>
+      <!--<textarea>Start by importing some useful functions:-->
 
 <!--log = #console.log.-->
 <!--stringify = #JSON.stringify.-->
@@ -143,7 +148,7 @@ this is not recognized at all and it is simply ignored</pre>
 
 <!--result = factorial of 10-->
 <!--log the result and-->
-<!--stringify the result too</pre>-->
+<!--stringify the result too</textarea>-->
     </article>
   </body>
 </html>

@@ -5624,7 +5624,6 @@ module.exports = (function() {
               return jsSentence !== SKIP;
             });
 
-    console.log(realSentences);
           var lastIndex = realSentences.length - 1;
           return realSentences.map(function (jsSentence, index) {
             return (index === lastIndex ? 'return ' : '') + jsSentence + ';';
