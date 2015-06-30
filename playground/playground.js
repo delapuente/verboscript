@@ -27,7 +27,7 @@
       source.style.height = source.scrollHeight + 'px';
       source.timeoutToSave = setTimeout(function _translate() {
         try {
-          var parsed = verboscript.parse(source.textContent);
+          var parsed = verboscript.parse(source.value);
           output.textContent = parsed.output.trim();
           with (document) {
             result.textContent = eval(parsed.output);
