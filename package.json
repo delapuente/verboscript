@@ -5,14 +5,14 @@
   "description": "Verboscript is a (work-in-progress) programming language focused on expressiveness and code clarity.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/lodr/verboscript.git"
+    "url": "git://github.com/delapuente/verboscript.git"
   },
   "keywords": [
     "programming-language",
     "transpiler",
     "javascript"
   ],
-  "homepage": "https://github.com/lodr/verboscript",
+  "homepage": "https://github.com/delapuente/verboscript",
   "author": "Salvador de la Puente González <salva@unoyunodiez.com> (http://unoyunodiez.com)",
   "license": "MIT",
   "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
